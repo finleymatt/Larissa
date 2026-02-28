@@ -22,8 +22,27 @@ export class OandaConnector implements BrokerConnector {
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
+        'Accept-Datetime-Format': 'RFC3339',
       },
+      responseType: 'json',
     });
+
+    // Intercept errors to produce readable messages instead of raw buffers
+    this.client.interceptors.response.use(
+      response => response,
+      error => {
+        if (error.response) {
+          const status = error.response.status;
+          const data = error.response.data;
+          const message = typeof data === 'object'
+            ? JSON.stringify(data, null, 2)
+            : String(data);
+          logger.error(`OANDA API error (${status}): ${message}`);
+          throw new Error(`OANDA API ${status}: ${message}`);
+        }
+        throw error;
+      },
+    );
   }
 
   async getAccount(): Promise<AccountInfo> {
