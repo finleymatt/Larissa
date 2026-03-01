@@ -165,7 +165,7 @@ export class TradingEngine {
         type: 'trade_opened',
         title: `New Trade: ${instrument}`,
         message: `${signal.action.toUpperCase()} ${assessment.positionSize} @ ${order.filledPrice} ` +
-          `| SL: ${assessment.stopLoss.toFixed(5)} | TP: ${assessment.takeProfit.toFixed(5)} ` +
+          `| SL: ${assessment.stopLoss.toFixed(2)} | TP: ${assessment.takeProfit.toFixed(2)} ` +
           `| Confidence: ${(signal.confidence * 100).toFixed(0)}%`,
         timestamp: Date.now(),
         data: {

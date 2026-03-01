@@ -1,7 +1,7 @@
 {
-  "name": "larissa-forex-trading-bot",
-  "version": "1.0.0",
-  "description": "A full-suite Forex trading bot with multi-strategy support, backtesting, and performance dashboard",
+  "name": "larissa-crypto-trading-bot",
+  "version": "2.0.0",
+  "description": "A full-suite crypto trading bot for Kraken with multi-strategy support, backtesting, and performance dashboard",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
@@ -36,6 +36,6 @@
     "ts-node": "^10.9.1",
     "typescript": "^5.3.2"
   },
-  "keywords": ["forex", "trading", "bot", "oanda", "backtesting"],
+  "keywords": ["crypto", "trading", "bot", "kraken", "backtesting", "bitcoin", "ethereum"],
   "license": "MIT"
 }

@@ -2,12 +2,12 @@ import {
   BrokerConnector, AccountInfo, Candle, Tick, Order, Position,
   Timeframe, OrderSide,
 } from '../types';
-import { generateId, pipsToPrice } from '../utils/helpers';
+import { generateId } from '../utils/helpers';
 import { logger } from '../utils/logger';
 
 /**
  * Paper trading connector that simulates order execution
- * without connecting to a real broker. Uses OANDA for price data
+ * without connecting to a real broker. Uses an exchange connector for price data
  * but executes trades in-memory.
  */
 export class PaperConnector implements BrokerConnector {
@@ -190,7 +190,7 @@ export class PaperConnector implements BrokerConnector {
   private calculatePnl(position: Position, closePrice: number): number {
     const direction = position.side === 'buy' ? 1 : -1;
     const priceDiff = (closePrice - position.entryPrice) * direction;
-    // For forex, PnL depends on the pair. Simplified calculation:
+    // PnL = price difference * direction * units
     return priceDiff * position.units;
   }
 

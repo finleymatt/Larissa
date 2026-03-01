@@ -67,22 +67,22 @@ export function loadConfig(overrides?: Partial<BotConfig>): BotConfig {
 
   const config: BotConfig = {
     mode: envOrDefault('TRADING_MODE', 'paper') as BotConfig['mode'],
-    oanda: {
-      apiKey: envOrDefault('OANDA_API_KEY', ''),
-      accountId: envOrDefault('OANDA_ACCOUNT_ID', ''),
-      apiUrl: envOrDefault('OANDA_API_URL', 'https://api-fxpractice.oanda.com'),
+    kraken: {
+      apiKey: envOrDefault('KRAKEN_API_KEY', ''),
+      apiSecret: envOrDefault('KRAKEN_API_SECRET', ''),
+      apiUrl: envOrDefault('KRAKEN_API_URL', 'https://api.kraken.com'),
     },
-    instruments: envOrDefault('CURRENCY_PAIRS', 'EUR_USD,GBP_USD,USD_JPY,AUD_USD').split(','),
+    instruments: envOrDefault('CRYPTO_PAIRS', 'BTC_USD,ETH_USD').split(','),
     timeframe: envOrDefault('TIMEFRAME', 'H1') as Timeframe,
     strategies,
     risk: {
       maxRiskPerTrade: envFloat('MAX_RISK_PER_TRADE', 0.02),
       maxOpenPositions: envInt('MAX_OPEN_POSITIONS', 5),
       maxDailyLoss: envFloat('MAX_DAILY_LOSS', 0.05),
-      defaultStopLossPips: envFloat('DEFAULT_STOP_LOSS_PIPS', 50),
-      defaultTakeProfitPips: envFloat('DEFAULT_TAKE_PROFIT_PIPS', 100),
-      maxPositionSize: envInt('MAX_POSITION_SIZE', 100000),
-      trailingStopPips: envFloat('TRAILING_STOP_PIPS', 0) || undefined,
+      defaultStopLossPercent: envFloat('DEFAULT_STOP_LOSS_PERCENT', 2),
+      defaultTakeProfitPercent: envFloat('DEFAULT_TAKE_PROFIT_PERCENT', 4),
+      maxPositionSize: envFloat('MAX_POSITION_SIZE', 1),
+      trailingStopPercent: envFloat('TRAILING_STOP_PERCENT', 0) || undefined,
     },
     alerts: {
       enableEmail: envBool('ENABLE_EMAIL_ALERTS', false),

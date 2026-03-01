@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import { loadConfig } from './config';
-import { OandaConnector } from './connectors/oanda';
+import { KrakenConnector } from './connectors/kraken';
 import { PaperConnector } from './connectors/paper';
 import { TradingEngine } from './engine';
 import { BacktestEngine } from './backtesting';
@@ -15,14 +15,14 @@ const program = new Command();
 
 program
   .name('larissa')
-  .description('Larissa Forex Trading Bot - Multi-strategy trading with backtesting and analytics')
+  .description('Larissa Crypto Trading Bot - Multi-strategy trading with backtesting and analytics')
   .version('1.0.0');
 
 program
   .command('trade')
   .description('Start live or paper trading')
   .option('-m, --mode <mode>', 'Trading mode: paper or live', 'paper')
-  .option('-i, --instruments <pairs>', 'Comma-separated currency pairs', 'EUR_USD,GBP_USD')
+  .option('-i, --instruments <pairs>', 'Comma-separated crypto pairs', 'BTC_USD,ETH_USD')
   .option('-t, --timeframe <tf>', 'Candle timeframe', 'H1')
   .option('-d, --dashboard', 'Enable dashboard', false)
   .action(async (options) => {
@@ -32,23 +32,23 @@ program
       timeframe: options.timeframe as Timeframe,
     });
 
-    if (config.mode === 'live' && !config.oanda.apiKey) {
-      logger.error('OANDA_API_KEY is required for live trading. Set it in .env');
+    if (config.mode === 'live' && !config.kraken.apiKey) {
+      logger.error('KRAKEN_API_KEY is required for live trading. Set it in .env');
       process.exit(1);
     }
 
-    const oandaConnector = new OandaConnector(
-      config.oanda.apiKey,
-      config.oanda.accountId,
-      config.oanda.apiUrl,
+    const krakenConnector = new KrakenConnector(
+      config.kraken.apiKey,
+      config.kraken.apiSecret,
+      config.kraken.apiUrl,
     );
 
     let connector: BrokerConnector;
     if (config.mode === 'paper') {
-      connector = new PaperConnector(10000, oandaConnector);
+      connector = new PaperConnector(10000, krakenConnector);
       logger.info('Starting in PAPER trading mode with $10,000 virtual balance');
     } else {
-      connector = oandaConnector;
+      connector = krakenConnector;
       logger.warn('Starting in LIVE trading mode - real money at risk!');
     }
 
@@ -82,25 +82,25 @@ program
   .description('Run a backtest on historical data')
   .requiredOption('-s, --start <date>', 'Start date (YYYY-MM-DD)')
   .requiredOption('-e, --end <date>', 'End date (YYYY-MM-DD)')
-  .option('-i, --instruments <pairs>', 'Comma-separated currency pairs', 'EUR_USD')
+  .option('-i, --instruments <pairs>', 'Comma-separated crypto pairs', 'BTC_USD')
   .option('-t, --timeframe <tf>', 'Candle timeframe', 'H1')
   .option('-b, --balance <amount>', 'Initial balance', '10000')
   .option('-d, --dashboard', 'Show results in dashboard', false)
   .action(async (options) => {
     const config = loadConfig();
 
-    if (!config.oanda.apiKey) {
-      logger.error('OANDA_API_KEY is required for fetching historical data. Set it in .env');
+    if (!config.kraken.apiKey) {
+      logger.error('KRAKEN_API_KEY is required for fetching historical data. Set it in .env');
       process.exit(1);
     }
 
-    const oandaConnector = new OandaConnector(
-      config.oanda.apiKey,
-      config.oanda.accountId,
-      config.oanda.apiUrl,
+    const krakenConnector = new KrakenConnector(
+      config.kraken.apiKey,
+      config.kraken.apiSecret,
+      config.kraken.apiUrl,
     );
 
-    const backtestEngine = new BacktestEngine(oandaConnector);
+    const backtestEngine = new BacktestEngine(krakenConnector);
 
     const result = await backtestEngine.run({
       startDate: options.start,
@@ -150,7 +150,7 @@ program
         config.dashboardPort,
         performanceTracker,
         riskManager,
-        oandaConnector,
+        krakenConnector,
       );
       dashboard.setBacktestResults(result);
       dashboard.start();
@@ -170,10 +170,10 @@ program
   .action(async (options) => {
     const config = loadConfig({ dashboardPort: parseInt(options.port, 10) });
 
-    const oandaConnector = new OandaConnector(
-      config.oanda.apiKey,
-      config.oanda.accountId,
-      config.oanda.apiUrl,
+    const krakenConnector = new KrakenConnector(
+      config.kraken.apiKey,
+      config.kraken.apiSecret,
+      config.kraken.apiUrl,
     );
 
     const performanceTracker = new PerformanceTracker();
@@ -183,7 +183,7 @@ program
       config.dashboardPort,
       performanceTracker,
       riskManager,
-      oandaConnector,
+      krakenConnector,
     );
     dashboard.start();
   });

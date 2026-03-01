@@ -5,7 +5,7 @@ import {
 import { StrategyEngine } from '../strategies';
 import { RiskManager } from '../risk';
 import { PerformanceTracker } from '../performance';
-import { generateId, pipsToPrice, pipValue } from '../utils/helpers';
+import { generateId } from '../utils/helpers';
 import { logger } from '../utils/logger';
 
 interface SimulatedPosition {

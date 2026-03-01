@@ -2,7 +2,6 @@ import {
   RiskConfig, RiskAssessment, AccountInfo, CompositeSignal,
   Position, OrderSide,
 } from '../types';
-import { pipsToPrice, pipValue } from '../utils/helpers';
 import { logger } from '../utils/logger';
 
 export class RiskManager {
@@ -50,32 +49,34 @@ export class RiskManager {
 
     // Calculate position size based on risk per trade
     const riskAmount = account.balance * this.config.maxRiskPerTrade;
-    const stopLossPips = this.config.defaultStopLossPips;
-    const pipVal = pipValue(instrument, currentPrice);
-    const positionSize = Math.floor(riskAmount / (stopLossPips * pipVal));
+    const slPercent = this.config.defaultStopLossPercent / 100;
+    const slDistance = currentPrice * slPercent;
+
+    // Position size = risk amount / stop loss distance per unit
+    const positionSize = riskAmount / slDistance;
 
     // Cap position size
     const units = Math.min(positionSize, this.config.maxPositionSize);
 
-    // Calculate stop loss and take profit prices
-    const slDistance = pipsToPrice(this.config.defaultStopLossPips, instrument);
-    const tpDistance = pipsToPrice(this.config.defaultTakeProfitPips, instrument);
+    // Calculate stop loss and take profit prices using percentages
+    const tpPercent = this.config.defaultTakeProfitPercent / 100;
 
     let stopLoss: number;
     let takeProfit: number;
 
     if (side === 'buy') {
-      stopLoss = currentPrice - slDistance;
-      takeProfit = currentPrice + tpDistance;
+      stopLoss = currentPrice * (1 - slPercent);
+      takeProfit = currentPrice * (1 + tpPercent);
     } else {
-      stopLoss = currentPrice + slDistance;
-      takeProfit = currentPrice - tpDistance;
+      stopLoss = currentPrice * (1 + slPercent);
+      takeProfit = currentPrice * (1 - tpPercent);
     }
 
-    const riskRewardRatio = this.config.defaultTakeProfitPips / this.config.defaultStopLossPips;
+    const riskRewardRatio = this.config.defaultTakeProfitPercent / this.config.defaultStopLossPercent;
 
     // Scale position size by signal confidence
-    const scaledUnits = Math.floor(units * signal.confidence);
+    // For crypto, keep fractional precision (don't floor)
+    const scaledUnits = parseFloat((units * signal.confidence).toFixed(8));
 
     if (scaledUnits <= 0) {
       return this.reject('Position size too small after confidence scaling');
@@ -83,7 +84,7 @@ export class RiskManager {
 
     logger.info(
       `Risk assessment: ${side} ${scaledUnits} ${instrument} ` +
-      `SL: ${stopLoss.toFixed(5)} TP: ${takeProfit.toFixed(5)} ` +
+      `SL: ${stopLoss.toFixed(2)} TP: ${takeProfit.toFixed(2)} ` +
       `RR: ${riskRewardRatio.toFixed(1)} Risk: $${riskAmount.toFixed(2)}`,
     );
 

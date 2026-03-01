@@ -1,6 +1,5 @@
 import {
-  generateId, pipValue, pipsToPrice, priceToPips,
-  roundToDecimals, formatCurrency, percentChange,
+  generateId, roundToDecimals, formatCurrency, percentChange,
 } from '../src/utils/helpers';
 
 describe('Helper Functions', () => {
@@ -13,35 +12,6 @@ describe('Helper Functions', () => {
 
     it('should return a string', () => {
       expect(typeof generateId()).toBe('string');
-    });
-  });
-
-  describe('pipValue', () => {
-    it('should return 0.0001 for non-JPY pairs', () => {
-      expect(pipValue('EUR_USD', 1.1)).toBe(0.0001);
-      expect(pipValue('GBP_USD', 1.3)).toBe(0.0001);
-    });
-
-    it('should return 0.01 for JPY pairs', () => {
-      expect(pipValue('USD_JPY', 110)).toBe(0.01);
-      expect(pipValue('EUR_JPY', 130)).toBe(0.01);
-    });
-  });
-
-  describe('pipsToPrice', () => {
-    it('should convert pips to price for non-JPY pairs', () => {
-      expect(pipsToPrice(50, 'EUR_USD')).toBeCloseTo(0.005);
-    });
-
-    it('should convert pips to price for JPY pairs', () => {
-      expect(pipsToPrice(50, 'USD_JPY')).toBeCloseTo(0.5);
-    });
-  });
-
-  describe('priceToPips', () => {
-    it('should convert price to pips', () => {
-      expect(priceToPips(0.005, 'EUR_USD')).toBeCloseTo(50);
-      expect(priceToPips(0.5, 'USD_JPY')).toBeCloseTo(50);
     });
   });
 

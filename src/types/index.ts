@@ -115,10 +115,10 @@ export interface RiskConfig {
   maxRiskPerTrade: number;     // fraction of account (e.g. 0.02 = 2%)
   maxOpenPositions: number;
   maxDailyLoss: number;        // fraction of account
-  defaultStopLossPips: number;
-  defaultTakeProfitPips: number;
-  maxPositionSize: number;     // max units per position
-  trailingStopPips?: number;
+  defaultStopLossPercent: number;  // percentage distance for stop loss (e.g. 2 = 2%)
+  defaultTakeProfitPercent: number; // percentage distance for take profit (e.g. 4 = 4%)
+  maxPositionSize: number;     // max units (fractional for crypto, e.g. 0.5 BTC)
+  trailingStopPercent?: number;
 }
 
 export interface RiskAssessment {
@@ -220,9 +220,9 @@ export interface Alert {
 
 export interface BotConfig {
   mode: TradingMode;
-  oanda: {
+  kraken: {
     apiKey: string;
-    accountId: string;
+    apiSecret: string;
     apiUrl: string;
   };
   instruments: string[];
